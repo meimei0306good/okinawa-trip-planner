@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OKINAWA 快樂遊 | 日系文青風</title>
     <style>
-        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.13 - 翻譯功能最終修正版 */
+        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.14 - 翻譯功能最終修訂版 */
         
         /* === 顏色定義 === */
         :root {
@@ -299,12 +299,13 @@
             transition: width 0.3s ease-in-out;
         }
         
-        /* --- V6.13 翻譯區塊反轉修正 (最終版) --- */
+        /* --- V6.14 翻譯區塊反轉最終修正 --- */
         #translation-output-wrapper {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
+        
         #translation-output-container {
             flex-grow: 1;
             background-color: var(--color-primary); /* 主色背景 */
@@ -312,7 +313,8 @@
             padding: 15px;
             border-radius: 8px;
             /* 核心反轉：將整個容器旋轉 180 度 */
-            transform: rotate(180deg) !important; /* 強制執行 */
+            /* 由於快取問題，使用更激進的 !important 搭配強制 transform */
+            transform: rotate(180deg) !important; 
             transition: transform 0.3s;
             display: flex;
             align-items: center; /* 讓文字垂直置中 */
@@ -326,7 +328,7 @@
             text-align: center;
             /* 將文字內容旋轉回來，使其在反轉的容器中呈現正向 */
             display: inline-block;
-            transform: rotate(-180deg) !important; /* 強制執行 */
+            transform: rotate(-180deg) !important; 
         }
 
         .tts-button {
@@ -338,6 +340,20 @@
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        /* V6.14: Google 翻譯按鈕 */
+        .google-translate-btn {
+            background-color: #f0ad4e; /* 橘色 */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
             transition: background-color 0.2s;
         }
 
@@ -586,6 +602,25 @@
             <textarea id="translate-input" placeholder="輸入中文 (如：我要結帳)..." rows="4" style="width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;"></textarea>
             
             <button onclick="translateText()" style="width: 100%; margin-top: 15px; font-weight: bold;">翻譯</button>
+
+            <button onclick="openGoogleTranslate()" class="google-translate-btn">
+                🌐 一鍵跳轉 Google 翻譯 (即時準確)
+            </button>
+            
+            <button class="toggle-guide-btn" onclick="toggleGuide(this, 'cache-clear-guide')">
+                旋轉方向錯誤？強制清除快取指引 (點擊展開)
+            </button>
+            <div id="cache-clear-guide" class="guide-content">
+                <p style="margin: 0;"><span class="highlight">強制旋轉樣式步驟：</span></p>
+                <ol style="font-size: 0.9em; margin-top: 5px;">
+                    <li>請先嘗試按 <span class="highlight">Ctrl + F5 (Windows)</span> 或 <span class="highlight">Shift + Command + R (Mac)</span> 強制重新整理。</li>
+                    <li>若仍無效，請進入手機瀏覽器的設定，找到<span class="highlight">「網站設定」</span>或<span class="highlight">「清除瀏覽資料」</span>。</li>
+                    <li>選擇<span class="highlight">「清除特定網站數據」</span>，找到並清除您這個網站的數據。</li>
+                    <li>重新開啟網站，旋轉樣式應該就會生效！</li>
+                </ol>
+            </div>
+
+
         </section>
 
         <section id="packing" class="feature-card">
@@ -670,7 +705,7 @@
         const ACCOMMODATION_ADDRESS = "1-chōme-12-6 Izumizaki Brillia Building 3/4 Floor, 那霸, Okinawa 900-0021, 日本";
         
         const ITINERARY_DATA = {
-            // ... (行程數據保持不變，與 V6.12 相同) ...
+            // ... (行程數據保持不變，與 V6.13 相同) ...
             "day1": [
                 {
                     "time": "18:20",
@@ -928,6 +963,7 @@
         // =================================================================
         // 【核心功能 1：頁面切換邏輯】(保持不變)
         // =================================================================
+        
         let activePageId = 'itinerary';
         function showPage(pageId) {
             activePageId = pageId;
@@ -1393,17 +1429,20 @@
         }
         
         // =================================================================
-        // 【核心功能 4：翻譯功能 (Translation) - V6.13 修正】
+        // 【核心功能 4：翻譯功能 (Translation) - V6.14 修正與擴充】
         // =================================================================
         
-        // V6.13 修正：新增「你好」翻譯，並調整通用預設回覆
+        // V6.14 修正與擴充：新增更多實用翻譯
         const TRANSLATION_MAP = {
             "我要結帳": "お会計をお願いします。",
             "廁所在哪裡": "トイレはどこですか？",
             "謝謝": "ありがとうございます。",
             "太貴了": "それはちょっと高いですね。",
             "我要大便": "トイレに行きたいです。",
-            "你好": "こんにちは。" // V6.13 新增
+            "你好": "こんにちは。", 
+            "請給我這個": "これをお願いします。", // V6.14 新增
+            "請問營業到幾點": "何時まで営業していますか？", // V6.14 新增
+            "多少錢": "いくらですか？" // V6.14 新增
         };
 
         function isCJK(text) {
@@ -1425,7 +1464,7 @@
             let translatedText;
             let targetLang;
             
-            // 由於這是純前端模擬，我們判斷為中文輸入，則模擬翻譯成日文
+            // 判斷為中文輸入，則模擬翻譯成日文
             if (isCJK(inputText)) {
                 targetLang = 'ja';
                 // 嘗試從對照表取得翻譯，否則使用 V6.13 通用預設回覆 (謝謝)
@@ -1465,6 +1504,19 @@
                 alert("抱歉，您的瀏覽器不支持語音播放功能。");
             }
         }
+        
+        // V6.14: 新增一鍵跳轉 Google 翻譯
+        function openGoogleTranslate() {
+            const inputText = document.getElementById('translate-input').value.trim();
+            if (inputText === '') {
+                alert("請先在上方輸入您想要翻譯的中文！");
+                return;
+            }
+            // 構建 Google 翻譯連結：從中文(zh-TW)到日文(ja)
+            const googleTranslateUrl = `https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(inputText)}`;
+            window.open(googleTranslateUrl, '_blank'); // 在新視窗/標籤頁開啟
+        }
+
 
         // =================================================================
         // 【核心功能 5：行李清單 (Packing List) - 保持不變】
