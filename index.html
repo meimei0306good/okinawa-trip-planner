@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OKINAWA 快樂遊 | 日系文青風</title>
     <style>
-        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.17 - 語音與旋轉最終修正 */
+        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.18 - 旋轉與語音最終修正 */
         
         /* === 顏色定義 === */
         :root {
@@ -299,33 +299,35 @@
             transition: width 0.3s ease-in-out;
         }
         
-        /* --- V6.17 翻譯區塊反轉最終修正 (使用 !important 強化) --- */
+        /* --- V6.18 翻譯區塊反轉最終修正 --- */
         #translation-output-wrapper {
-            position: sticky !important; /* 設置為固定定位 */
-            top: 0 !important; /* 固定在頁面最上方 */
-            z-index: 1000 !important; /* 確保在其他內容之上 */
+            position: sticky !important; 
+            top: 0 !important; 
+            z-index: 1000 !important; 
             display: flex !important;
             gap: 10px !important;
-            margin: -25px -15px 25px -15px !important; /* 擴展到邊緣並提供下方間距 */
-            padding-top: 25px !important; /* 補償頂部距離 */
+            margin: -25px -15px 25px -15px !important; 
+            padding-top: 25px !important; 
             padding-bottom: 20px !important;
-            background-color: var(--color-background) !important; /* 確保背景不會透明 */
+            background-color: var(--color-background) !important; 
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
         }
 
         #translation-output-container {
             flex-grow: 1 !important;
-            background-color: var(--color-primary) !important; /* 主色背景 */
+            background-color: var(--color-primary) !important; 
             color: white !important;
             padding: 15px !important;
-            border-radius: 0 8px 8px 0 !important; /* 僅右側圓角 */
-            /* 核心反轉：將整個容器旋轉 180 度 */
+            border-radius: 0 8px 8px 0 !important; 
+            /* 核心反轉：將整個容器旋轉 180 度，這應該是絕對的。 */
             transform: rotate(180deg) !important; 
             transition: transform 0.3s;
             display: flex !important;
-            align-items: center !important; /* 讓文字垂直置中 */
+            align-items: center !important; 
             justify-content: center !important;
-            min-height: 60px !important; /* 確保有足夠高度 */
+            min-height: 60px !important; 
+            /* V6.18 新增：確保文本方向正常，文字才不會在旋轉後變歪 */
+            writing-mode: horizontal-tb !important; 
         }
         
         /* 翻譯結果文字 */
@@ -335,18 +337,19 @@
             font-weight: bold !important;
             text-align: center !important;
             
-            /* 將文字內容旋轉回來，使其在反轉的容器中呈現正向 */
-            transform: rotate(-180deg) !important; 
-            display: inline-block !important; /* 確保旋轉生效 */
+            /* V6.18 修正：移除反向旋轉，讓整個容器決定旋轉 */
+            transform: none !important; 
+            display: inline-block !important; 
+            line-height: 1.2;
         }
         
-        /* 翻譯結果文字內的中文備註 */
+        /* 翻譯結果文字內的中文備註 (給使用者看的提示) */
         #translation-output .chinese-note {
-             /* 由於父元素已經旋轉 180 度，這個子元素不需要額外旋轉 */
+            /* V6.18 修正：確保中文在正向閱讀時是小字提示 */
             font-size: 0.6em !important; 
             font-weight: normal !important; 
             color: #ccc !important;
-            display: block !important; /* 讓中文換行 */
+            display: block !important; 
             margin-top: 5px !important;
         }
 
@@ -647,9 +650,12 @@
             <div id="translation-output-wrapper">
                  <button onclick="speakTranslation()" class="tts-button">🔊 讀出</button>
                  <div id="translation-output-container">
-                    <p id="translation-output" data-japanese-text="請點選下方語句開始翻譯">
-                         請點選下方語句開始翻譯
-                    </p>
+                    <div id="translation-output" 
+                         data-japanese-text="下のフレーズを選んでください"
+                         data-chinese-text="請點選下方語句開始翻譯">
+                         下のフレーズを選んでください
+                         <span class="chinese-note">請點選下方語句開始翻譯</span>
+                    </div>
                 </div>
             </div>
             
@@ -1517,7 +1523,7 @@
         }
         
         // =================================================================
-        // 【核心功能 4：情境翻譯寶典 (Translation) - V6.17 修正】
+        // 【核心功能 4：情境翻譯寶典 (Translation) - V6.18 最終修正】
         // =================================================================
         
         function renderPhraseList() {
@@ -1559,16 +1565,17 @@
             }
         }
 
-        // V6.17 修正：將日文和中文分開，日文放在主文本，中文放在 data 屬性。
+        // V6.18 修正：使用 DIV 標籤，並將日文和中文用 data 屬性存儲
         function displayTranslation(button) {
             const japaneseText = button.getAttribute('data-japanese');
             const chineseText = button.getAttribute('data-chinese');
             const outputElement = document.getElementById('translation-output');
             
-            // 修正 1. 設置日文文本到 data 屬性，確保語音函數能精確讀取
+            // 修正 1. 將純日文和中文都存入 data 屬性
             outputElement.setAttribute('data-japanese-text', japaneseText);
+            outputElement.setAttribute('data-chinese-text', chineseText);
             
-            // 修正 2. 輸出結構：日文在前，中文在一個單獨的 span 內，確保中文不被旋轉影響且語音不會讀取。
+            // 修正 2. 輸出結構：日文為主，中文為提示（在旋轉時，中文看起來會是倒置的提示字）
             outputElement.innerHTML = `
                 ${japaneseText}
                 <span class="chinese-note">(${chineseText})</span>
@@ -1578,17 +1585,16 @@
             speakTranslation();
         }
 
-        // V6.17 修正：僅讀取 data-japanese-text 屬性，完全忽略 innerHTML 中的中文備註
+        // V6.18 最終修正：**只**讀取 data-japanese-text 屬性，完全忽略 innerHTML 中的中文備註
         function speakTranslation() {
             const outputElement = document.getElementById('translation-output');
-            // 從 data 屬性中獲取純日文文本，這是 V6.17 修正的核心
-            const outputText = outputElement.getAttribute('data-japanese-text'); 
             
-            if (!outputText || outputText.includes("請點選")) {
-                // 如果是初始狀態或沒有文本，則不執行語音
-                if (!outputText.includes("請點選")) { // 避免初始狀態的警告
-                    alert("請先點選下方情境語句。");
-                }
+            // 🚀 V6.18 最終暴力修正：確保語音來源只來自這個純文本屬性。
+            const outputText = outputElement.getAttribute('data-japanese-text'); 
+            const isInitialState = outputText.includes("下のフレーズを選んでください");
+
+            if (isInitialState) {
+                 // 避免初始狀態的警告
                 return;
             }
             
@@ -1597,6 +1603,9 @@
                 
                 // 情境翻譯都是日文
                 utterance.lang = 'ja-JP'; 
+                
+                // 修正：設置較快的語速以確保在手機上表現良好
+                utterance.rate = 1.2; 
                 
                 window.speechSynthesis.cancel();
                 window.speechSynthesis.speak(utterance);
