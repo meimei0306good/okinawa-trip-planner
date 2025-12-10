@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OKINAWA 快樂遊 | 日系文青風</title>
     <style>
-        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.14 - 翻譯功能最終修訂版 */
+        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.15 - 情境翻譯寶典 */
         
         /* === 顏色定義 === */
         :root {
@@ -96,8 +96,8 @@
         .feature-card.active {
             display: block; 
         }
-        
-        /* --- 行程表 & 其他樣式 (保持不變) --- */
+
+        /* --- 行程表 & 其他樣式 (V6.14) --- */
         
         /* V6.7: 頂部資訊區塊 (固定定位) */
         #itinerary-header-wrapper {
@@ -267,7 +267,7 @@
             color: var(--color-primary); 
         }
         
-        /* V6.11: 讓機場和住宿卡片更醒目 (滿足 Day 1/6 要求) */
+        /* V6.11: 讓機場和住宿卡片更醒目 */
         .itinerary-card.type-flight-out .card-title,
         .itinerary-card.type-flight-in .card-title,
         .itinerary-card.type-accommodation .card-title {
@@ -299,28 +299,35 @@
             transition: width 0.3s ease-in-out;
         }
         
-        /* --- V6.14 翻譯區塊反轉最終修正 --- */
+        /* --- V6.15 翻譯區塊反轉最終修正 --- */
         #translation-output-wrapper {
+            position: sticky; /* 設置為固定定位 */
+            top: 0; /* 固定在頁面最上方 */
+            z-index: 1000; /* 確保在其他內容之上 */
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin: -25px -15px 25px -15px; /* 擴展到邊緣並提供下方間距 */
+            padding-top: 25px; /* 補償頂部距離 */
+            padding-bottom: 20px;
+            background-color: var(--color-background); /* 確保背景不會透明 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-        
+
         #translation-output-container {
             flex-grow: 1;
             background-color: var(--color-primary); /* 主色背景 */
             color: white;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 0 8px 8px 0; /* 僅右側圓角 */
             /* 核心反轉：將整個容器旋轉 180 度 */
-            /* 由於快取問題，使用更激進的 !important 搭配強制 transform */
             transform: rotate(180deg) !important; 
             transition: transform 0.3s;
             display: flex;
             align-items: center; /* 讓文字垂直置中 */
             justify-content: center;
         }
-
+        
+        /* 翻譯結果文字 */
         #translation-output {
             margin: 0;
             font-size: 1.5em; 
@@ -331,6 +338,7 @@
             transform: rotate(-180deg) !important; 
         }
 
+        /* 語音按鈕 */
         .tts-button {
             flex-shrink: 0;
             background-color: #5cb85c; /* 綠色 */
@@ -338,26 +346,99 @@
             border: none;
             padding: 0 15px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 8px 0 0 8px; /* 僅左側圓角 */
             cursor: pointer;
             transition: background-color 0.2s;
+            height: 60px; /* 調整高度與輸出區塊一致 */
         }
-
-        /* V6.14: Google 翻譯按鈕 */
-        .google-translate-btn {
-            background-color: #f0ad4e; /* 橘色 */
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
+        
+        /* V6.15: 情境翻譯點擊按鈕 (非收合按鈕) */
+        .phrase-button {
+            display: block;
             width: 100%;
-            margin-top: 10px;
-            transition: background-color 0.2s;
+            background-color: var(--color-accent-light);
+            color: var(--color-text);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border: 1px solid var(--color-light-gray);
+            border-radius: 6px;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-size: 0.95em;
+            font-weight: bold;
         }
 
-        /* 其他樣式 (保持不變) */
+        .phrase-button:hover {
+            background-color: var(--color-accent-dark);
+            border-color: var(--color-primary);
+        }
+
+        /* 可收合元件 (Collapsible) 通用樣式 (用於分類) */
+        .collapsible-container {
+             margin-bottom: 15px;
+        }
+
+        .collapsible {
+            background-color: white;
+            color: var(--color-primary);
+            cursor: pointer;
+            padding: 12px 15px;
+            width: 100%;
+            border: 1px solid var(--color-primary);
+            text-align: left;
+            outline: none;
+            font-size: 1em;
+            transition: background-color 0.2s;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px; 
+            margin-bottom: 5px; /* 為展開內容提供空間 */
+        }
+        
+        .collapsible-content {
+            display: none;
+            padding: 10px 0; /* 內容無需 padding，讓裡面的按鈕自帶 padding */
+            background-color: white; 
+            border: 1px solid var(--color-primary);
+            border-top: none; 
+            border-radius: 0 0 8px 8px; 
+        }
+        .collapsible-content-padding {
+            padding: 0 15px 5px 15px; /* 內層額外 padding */
+        }
+        
+        /* Arrow 修正 */
+        .arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.8em;
+        }
+
+        .collapsible.active .arrow {
+            transform: rotate(90deg);
+        }
+        
+        /* 可收合元件 (Collapsible) 通用樣式 (用於分類) */
+        .collapsible-container {
+             margin-bottom: 15px;
+        }
+
+        /* 讓巴士小撇步的容器和內容使用白色背景，與頂部藍色區塊區隔 */
+        #itinerary-header-wrapper .collapsible {
+            background-color: white;
+            color: var(--color-primary);
+            border: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        #itinerary-header-wrapper .collapsible-content {
+            background-color: white;
+            border-top: none;
+            color: var(--color-text);
+            font-weight: normal;
+        }
         
         .toggle-guide-btn {
             background-color: var(--color-accent-light);
@@ -385,7 +466,6 @@
             list-style-type: none; 
             padding-left: 0;
         }
-        /* V6.7: 用這個類別標記重點文字，取代**符號 */
         .guide-content .highlight {
             color: var(--color-primary);
             font-weight: bold;
@@ -455,53 +535,15 @@
             font-weight: bold;
             color: var(--color-primary);
         }
-
-        /* 可收合元件 (Collapsible) 通用樣式 */
-        .collapsible-container {
-             margin-bottom: 15px;
-        }
-
-        .collapsible {
-            background-color: white;
-            color: var(--color-primary);
-            cursor: pointer;
-            padding: 12px 15px;
-            width: 100%;
-            border: 1px solid var(--color-primary);
-            text-align: left;
-            outline: none;
-            font-size: 1em;
-            transition: background-color 0.2s;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 8px; 
-        }
         
-        /* V6.7 修正破圖問題: 確保 content 區塊也有白色背景 */
-        .collapsible-content {
-            display: none;
-            padding: 15px;
-            background-color: white; /* 確保展開內容有白色背景 */
-            border: 1px solid var(--color-primary);
-            border-top: none; 
-            border-radius: 0 0 8px 8px; 
-        }
-
-        /* 讓巴士小撇步的容器和內容使用白色背景，與頂部藍色區塊區隔 */
-        #itinerary-header-wrapper .collapsible {
-            background-color: white;
-            color: var(--color-primary);
+        .delete-btn {
+            background-color: var(--color-danger);
+            color: white;
             border: none;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        #itinerary-header-wrapper .collapsible-content {
-            background-color: white;
-            border-top: none;
-            color: var(--color-text);
-            font-weight: normal;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            border-radius: 4px;
+            cursor: pointer;
         }
         
     </style>
@@ -588,24 +630,21 @@
         </section>
 
         <section id="translation" class="feature-card">
-            <h3 style="color: var(--color-primary); margin-top: 0;">翻譯結果</h3>
             
             <div id="translation-output-wrapper">
-                 <div id="translation-output-container">
-                    <p id="translation-output">[在這裡查看翻譯]</p>
-                </div>
                  <button onclick="speakTranslation()" class="tts-button">🔊 讀出</button>
+                 <div id="translation-output-container">
+                    <p id="translation-output">請點選下方語句開始翻譯</p>
+                </div>
             </div>
             
-            <div class="page-header" style="margin-top: 0; border-bottom: none;">🗣️ 即時翻譯</div>
-
-            <textarea id="translate-input" placeholder="輸入中文 (如：我要結帳)..." rows="4" style="width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;"></textarea>
+            <div class="page-header" style="margin-top: 0; border-bottom: none;">
+                🗣️ 情境翻譯寶典
+                <p style="font-size: 0.6em; color: #999; margin-top: 5px;">點擊句子即可在上方顯示並讀出</p>
+            </div>
             
-            <button onclick="translateText()" style="width: 100%; margin-top: 15px; font-weight: bold;">翻譯</button>
-
-            <button onclick="openGoogleTranslate()" class="google-translate-btn">
-                🌐 一鍵跳轉 Google 翻譯 (即時準確)
-            </button>
+            <div id="phrase-list-container">
+                </div>
             
             <button class="toggle-guide-btn" onclick="toggleGuide(this, 'cache-clear-guide')">
                 旋轉方向錯誤？強制清除快取指引 (點擊展開)
@@ -664,7 +703,7 @@
     <script>
         
         // =================================================================
-        // 【核心資料與日期計算】(保持不變)
+        // 【核心資料與日期計算】(已完整展開)
         // =================================================================
         
         const START_DATE = new Date('2025-12-27T00:00:00');
@@ -705,7 +744,6 @@
         const ACCOMMODATION_ADDRESS = "1-chōme-12-6 Izumizaki Brillia Building 3/4 Floor, 那霸, Okinawa 900-0021, 日本";
         
         const ITINERARY_DATA = {
-            // ... (行程數據保持不變，與 V6.13 相同) ...
             "day1": [
                 {
                     "time": "18:20",
@@ -959,7 +997,49 @@
         // 記帳相關變數與匯率 (保持不變)
         let expenses = []; 
         const EXCHANGE_RATE_TWD_TO_JPY = 4.5; 
+        
+        // V6.15 新增：情境式翻譯資料
+        const SCENARIO_TRANSLATIONS = {
+            "👋 問候與禮貌": {
+                "你好": "こんにちは。",
+                "早安": "おはようございます。",
+                "晚安": "おやすみなさい。",
+                "謝謝": "ありがとうございます。",
+                "不客氣": "どういたしまして。",
+                "抱歉/不好意思": "すみません。",
+                "請問您會說英文嗎？": "英語を話しますか？", 
+                "這是我的護照。": "これは私のパスポートです。" 
+            },
+            "🚌 交通與路線": {
+                "請問這台公車是要到 [美國村] 的嗎？": "このバスは [アメリカンビレッジ] に行きますか？",
+                "請問到 [那霸巴士總站] 怎麼走？": "[那覇バスターミナル] へはどう行けばいいですか？",
+                "請在這裡停車。": "ここで止めてください。",
+                "請問有到機場的車嗎？": "空港に行く車はありますか？",
+                "美ら海水族館": "美ら海水族館（ちゅらうみすいぞくかん）", 
+                "瀨長島": "瀬長島（せながじま）", 
+                "單軌電車": "ゆいレール（ゆいれーる）" 
+            },
+            "🛍️ 購物與結帳": {
+                "請問有這個商品嗎？": "この商品はありますか？",
+                "請問這個商品放在哪裡？": "この商品はどこにありますか？",
+                "這個多少錢？": "これはいくらですか？", 
+                "我要結帳。": "お会計をお願いします。",
+                "不用袋子，謝謝。": "袋は要りません。ありがとう。",
+                "可以退稅嗎？": "免税（めんぜい）できますか？", 
+                "只收現金嗎？": "現金のみですか？" 
+            },
+            "🍽️ 飲食與餐廳": {
+                "請問有英文菜單嗎？": "英語のメニューはありますか？",
+                "廁所在哪裡？": "トイレはどこですか？",
+                "請給我這個。": "これをお願いします。",
+                "請問可以外帶嗎？": "テイクアウトできますか？",
+                "我已經預約了。": "予約しています。", 
+                "幾位？": "何名様ですか？", 
+                "請給我水。": "お水をください。" 
+            }
+        };
 
+        
         // =================================================================
         // 【核心功能 1：頁面切換邏輯】(保持不變)
         // =================================================================
@@ -994,7 +1074,7 @@
 
 
         // =================================================================
-        // 【核心功能 2：行程表 (Itinerary) - V6.11 渲染邏輯】(保持不變)
+        // 【核心功能 2：行程表 (Itinerary) - 渲染邏輯】(保持不變)
         // =================================================================
         
         // 交通指南/清單 展開/收合功能 (in-card)
@@ -1014,10 +1094,13 @@
         function toggleCollapsible(button) {
             button.classList.toggle('active');
             const content = button.nextElementSibling;
+            const arrow = button.querySelector('.arrow');
             if (content.style.display === "block") {
                 content.style.display = "none";
+                if (arrow) arrow.style.transform = "rotate(0deg)";
             } else {
                 content.style.display = "block";
+                if (arrow) arrow.style.transform = "rotate(90deg)";
             }
         }
         
@@ -1034,7 +1117,6 @@
                 selectorContainer.appendChild(button);
             });
             
-            // 預設選中 Day 1，但如果用戶先前有選擇，則保持選擇
             const defaultDay = localStorage.getItem('activeDay') || 'day1';
             showItinerary(defaultDay);
         }
@@ -1045,13 +1127,11 @@
              const info = DATE_INFOS[dayKey];
              const weather = WEATHER_DATA[dayKey];
              
-             // V6.7: 更新頂部日期顯示 (字體放大)
              dayInfoDisplay.innerHTML = `
                  <span style="font-weight: normal;">${info.date} ${info.weekday}</span>
                  <span class="day-number-text">Day ${dayKey.slice(3)}</span>
              `;
              
-             // 更新天氣卡片
              weatherCard.innerHTML = `
                 <div class="weather-info">
                     <div class="weather-condition">${weather.condition}</div>
@@ -1068,7 +1148,6 @@
             const displayArea = document.getElementById('itinerary-display');
             const dayTabs = document.querySelectorAll('.day-tab');
             
-            // 1. 儲存並更新選單樣式
             localStorage.setItem('activeDay', selectedDayKey);
             dayTabs.forEach((tab, index) => {
                 tab.classList.remove('active');
@@ -1077,10 +1156,8 @@
                 }
             });
             
-            // 2. 更新天氣卡片
             renderWeatherCard(selectedDayKey);
 
-            // 3. 渲染行程列表
             const dayItinerary = ITINERARY_DATA[selectedDayKey] || [];
             
             let htmlContent = '';
@@ -1091,14 +1168,11 @@
                     let detailsHtml;
                     let mapLinkHtml = '';
                     
-                    // 根據類型判斷是否顯示時間 (機場/住宿顯示時間)
                     const showTime = item.type.includes('flight') || item.type.includes('accommodation'); 
                     const timeHtml = showTime ? `<span class="card-time">${item.time}</span>` : '';
                     
-                    // 取得 Icon
                     const icon = ITINERARY_ICONS[item.type] || ITINERARY_ICONS.default;
 
-                    // Icon 在卡片內，與時間/標題組合
                     const iconHtml = `<div class="itinerary-icon-in-card">${icon}</div>`;
                     const titleTimeGroup = `
                         <div class="card-title-time-group">
@@ -1114,7 +1188,7 @@
                     `;
 
 
-                    // ★★★ 特殊內容處理邏輯 V6.11 修正玉泉洞流程圖 ★★★
+                    // ★★★ 特殊內容處理邏輯 (與 V6.14 相同) ★★★
                     if (item.special_content === "port_kawagoe_guide") {
                          detailsHtml = `
                             <div class="card-details">
@@ -1263,7 +1337,7 @@
                                 </ul>
                             </div>
                         `;
-                    } else if (item.special_content === "gyokusendo_guide_v610") { // V6.11 玉泉洞流程圖
+                    } else if (item.special_content === "gyokusendo_guide_v610") { 
                         detailsHtml = `
                             <div class="card-details">
                                 <p style="margin: 0;">${item.details}</p>
@@ -1286,7 +1360,7 @@
                                 </div>
                             </div>
                         `;
-                    } else if (item.special_content === "kokusai_street_guide") { // V6.10 國際通
+                    } else if (item.special_content === "kokusai_street_guide") { 
                          detailsHtml = `
                             <div class="card-details">
                                 <p style="margin: 0;">${item.details}</p>
@@ -1312,7 +1386,6 @@
                     }
                     // ★★★ 特殊內容處理邏輯 End ★★★
                     
-                    // 組合最終卡片 HTML
                     htmlContent += `
                         <div class="itinerary-card type-${item.type}">
                             <div class="card-timeline-icon"></div> <div class="card-content-wrapper">
@@ -1429,74 +1502,80 @@
         }
         
         // =================================================================
-        // 【核心功能 4：翻譯功能 (Translation) - V6.14 修正與擴充】
+        // 【核心功能 4：情境翻譯寶典 (Translation) - V6.15 重構】
         // =================================================================
         
-        // V6.14 修正與擴充：新增更多實用翻譯
-        const TRANSLATION_MAP = {
-            "我要結帳": "お会計をお願いします。",
-            "廁所在哪裡": "トイレはどこですか？",
-            "謝謝": "ありがとうございます。",
-            "太貴了": "それはちょっと高いですね。",
-            "我要大便": "トイレに行きたいです。",
-            "你好": "こんにちは。", 
-            "請給我這個": "これをお願いします。", // V6.14 新增
-            "請問營業到幾點": "何時まで営業していますか？", // V6.14 新增
-            "多少錢": "いくらですか？" // V6.14 新增
-        };
-
-        function isCJK(text) {
-            // 判斷是否包含中日韓文字
-            const cjkRegex = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]/; 
-            return cjkRegex.test(text);
+        function renderPhraseList() {
+            const listContainer = document.getElementById('phrase-list-container');
+            listContainer.innerHTML = '';
+            
+            for (const category in SCENARIO_TRANSLATIONS) {
+                // 1. 類別標題 (可收合按鈕)
+                let categoryHtml = `
+                    <div class="collapsible-container">
+                        <button class="collapsible" onclick="toggleCollapsible(this)">
+                            ${category}
+                            <span class="arrow">▶</span>
+                        </button>
+                        <div class="collapsible-content">
+                            <div class="collapsible-content-padding">
+                `;
+                
+                // 2. 常用語句按鈕
+                const phrases = SCENARIO_TRANSLATIONS[category];
+                for (const chinesePhrase in phrases) {
+                    const japanesePhrase = phrases[chinesePhrase];
+                    categoryHtml += `
+                        <button class="phrase-button" 
+                                data-japanese="${japanesePhrase}" 
+                                data-chinese="${chinesePhrase}"
+                                onclick="displayTranslation(this)">
+                            ${chinesePhrase}
+                        </button>
+                    `;
+                }
+                
+                categoryHtml += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+                listContainer.innerHTML += categoryHtml;
+            }
         }
 
-        function translateText() {
-            const inputText = document.getElementById('translate-input').value.trim();
+        // 點擊常用語句時，將日文顯示在上方並呼叫語音
+        function displayTranslation(button) {
+            const japaneseText = button.getAttribute('data-japanese');
+            const chineseText = button.getAttribute('data-chinese');
             const outputElement = document.getElementById('translation-output');
             
-            if (inputText === '') {
-                outputElement.textContent = "請輸入要翻譯的文字。";
-                outputElement.removeAttribute('data-lang');
-                return;
-            }
+            // 顯示中文和日文（反轉後只顯示日文）
+            outputElement.innerHTML = `${japaneseText}<br><span style="font-size: 0.6em; font-weight: normal; color: #ccc; transform: rotate(-180deg) !important;">${chineseText}</span>`;
             
-            let translatedText;
-            let targetLang;
+            // 設置語言標籤，以便語音播放
+            outputElement.setAttribute('data-lang', 'ja');
             
-            // 判斷為中文輸入，則模擬翻譯成日文
-            if (isCJK(inputText)) {
-                targetLang = 'ja';
-                // 嘗試從對照表取得翻譯，否則使用 V6.13 通用預設回覆 (謝謝)
-                translatedText = TRANSLATION_MAP[inputText] || "ありがとうございます。 (謝謝。)"; 
-            } else {
-                // 模擬其他語言輸入，則翻譯回中文
-                targetLang = 'zh';
-                translatedText = "不好意思，我不太明白您的意思。";
-            }
-            
-            outputElement.textContent = translatedText;
-            outputElement.setAttribute('data-lang', targetLang);
+            // 語音播放
+            speakTranslation();
         }
-        
+
+
         function speakTranslation() {
             const outputElement = document.getElementById('translation-output');
-            const outputText = outputElement.textContent;
+            // 僅讀出日文部分 (即 <br> 標籤之前的部分)
+            const outputText = outputElement.textContent.split('\n')[0].trim();
             
-            if (outputText.includes("請輸入") || outputText.includes("不太明白")) {
-                alert("請先輸入文字並進行翻譯，或翻譯結果無法讀出。");
+            if (outputText.includes("請點選")) {
+                alert("請先點選下方情境語句。");
                 return;
             }
             
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(outputText);
                 
-                const targetLang = outputElement.getAttribute('data-lang');
-                if (targetLang === 'ja') {
-                    utterance.lang = 'ja-JP'; // 日文語音
-                } else {
-                    utterance.lang = 'zh-TW'; // 中文語音
-                }
+                // 情境翻譯都是日文
+                utterance.lang = 'ja-JP'; 
                 
                 window.speechSynthesis.cancel();
                 window.speechSynthesis.speak(utterance);
@@ -1505,17 +1584,8 @@
             }
         }
         
-        // V6.14: 新增一鍵跳轉 Google 翻譯
-        function openGoogleTranslate() {
-            const inputText = document.getElementById('translate-input').value.trim();
-            if (inputText === '') {
-                alert("請先在上方輸入您想要翻譯的中文！");
-                return;
-            }
-            // 構建 Google 翻譯連結：從中文(zh-TW)到日文(ja)
-            const googleTranslateUrl = `https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(inputText)}`;
-            window.open(googleTranslateUrl, '_blank'); // 在新視窗/標籤頁開啟
-        }
+        // V6.15: 交通指南/清單 展開/收合功能 (in-card) - 保持不變 (for translation page guide)
+        // 註：實際功能實作在上方 toggleGuide
 
 
         // =================================================================
@@ -1546,7 +1616,7 @@
                 packingList[category].forEach(item => {
                     const isChecked = checkedItems[item] ? 'checked' : ''; 
                     categoryHtml += `
-                        <div style="margin-bottom: 10px;">
+                        <div style="margin-bottom: 10px; padding: 0 15px;">
                             <input type="checkbox" id="item-${item}" style="margin-right: 5px;" 
                                    ${isChecked} 
                                    onclick="togglePackingItem('${item}', this.checked)"> 
@@ -1596,6 +1666,9 @@
             renderPackingList(); 
             updateProgress(); 
             loadExpenses(); 
+            
+            // V6.15 新增：渲染情境翻譯列表
+            renderPhraseList();
         }
 
     </script>
