@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OKINAWA 快樂遊 | 日系文青風</title>
     <style>
-        /* CSS 樣式區域：日系文青藍黃風格 V6.11 - 修正與優化版 */
+        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.12 - 翻譯功能修正版 */
         
         /* === 顏色定義 === */
         :root {
@@ -97,7 +97,7 @@
             display: block; 
         }
         
-        /* --- 行程表 V6.10 導覽與時間軸 CSS (Fixed Header) --- */
+        /* --- 行程表 & 其他樣式 (保持不變) --- */
         
         /* V6.7: 頂部資訊區塊 (固定定位) */
         #itinerary-header-wrapper {
@@ -282,9 +282,66 @@
             font-weight: bold;
             color: var(--color-danger); /* 醒目紅色 */
         }
+        
+        /* V6.11: 行李清單進度條修正 */
+        #packing-progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--color-light-gray);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
 
+        #packing-progress-bar-fill {
+            height: 100%;
+            background-color: var(--color-primary);
+            transition: width 0.3s ease-in-out;
+        }
+        
+        /* --- V6.12 翻譯區塊反轉修正 --- */
+        #translation-output-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #translation-output-container {
+            flex-grow: 1;
+            background-color: var(--color-primary); /* 主色背景 */
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            /* 核心反轉：將整個容器旋轉 180 度 */
+            transform: rotate(180deg); 
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center; /* 讓文字垂直置中 */
+            justify-content: center;
+        }
 
-        /* --- 其他樣式 --- */
+        #translation-output {
+            margin: 0;
+            font-size: 1.5em; 
+            font-weight: bold;
+            text-align: center;
+            /* 將文字內容旋轉回來，使其在反轉的容器中呈現正向 */
+            display: inline-block;
+            transform: rotate(-180deg);
+        }
+
+        .tts-button {
+            flex-shrink: 0;
+            background-color: #5cb85c; /* 綠色 */
+            color: white;
+            border: none;
+            padding: 0 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        /* 其他樣式 (保持不變) */
         
         .toggle-guide-btn {
             background-color: var(--color-accent-light);
@@ -383,7 +440,6 @@
             color: var(--color-primary);
         }
 
-
         /* 可收合元件 (Collapsible) 通用樣式 */
         .collapsible-container {
              margin-bottom: 15px;
@@ -432,23 +488,6 @@
             font-weight: normal;
         }
         
-        /* --- V6.11: 行李清單進度條修正 --- */
-        #packing-progress-bar {
-            width: 100%;
-            height: 8px;
-            background-color: var(--color-light-gray);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-
-        #packing-progress-bar-fill {
-            height: 100%;
-            background-color: var(--color-primary);
-            transition: width 0.3s ease-in-out;
-        }
-
-        
     </style>
 </head>
 <body>
@@ -491,7 +530,7 @@
         </section>
 
         <section id="accounting" class="feature-card">
-            <div class="page-header">💰 是免稅，不是免費</div>
+             <div class="page-header">💰 是免稅，不是免費</div>
             
             <div style="background-color: var(--color-accent-light); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--color-light-gray);">
                 <p style="margin-top: 0; font-weight: bold;">總支出估算 (TWD)</p>
@@ -544,13 +583,13 @@
             
             <div class="page-header" style="margin-top: 0; border-bottom: none;">🗣️ 即時翻譯</div>
 
-            <textarea id="translate-input" placeholder="輸入中文或日文..." rows="4" style="width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;"></textarea>
+            <textarea id="translate-input" placeholder="輸入中文 (如：我要結帳)..." rows="4" style="width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;"></textarea>
             
             <button onclick="translateText()" style="width: 100%; margin-top: 15px; font-weight: bold;">翻譯</button>
         </section>
 
         <section id="packing" class="feature-card">
-             <div class="page-header">📦 行李清單</div>
+            <div class="page-header">📦 行李清單</div>
             
             <div id="packing-progress-container" style="margin-bottom: 25px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end;">
@@ -590,7 +629,7 @@
     <script>
         
         // =================================================================
-        // 【核心資料與日期計算】
+        // 【核心資料與日期計算】(保持不變)
         // =================================================================
         
         const START_DATE = new Date('2025-12-27T00:00:00');
@@ -630,8 +669,8 @@
 
         const ACCOMMODATION_ADDRESS = "1-chōme-12-6 Izumizaki Brillia Building 3/4 Floor, 那霸, Okinawa 900-0021, 日本";
         
-        // ★★★ V6.11 數據修正：Day 5 & Day 6 內容調整 ★★★
         const ITINERARY_DATA = {
+            // ... (行程數據保持不變) ...
             "day1": [
                 {
                     "time": "18:20",
@@ -859,7 +898,7 @@
                 "保養品、面膜、護髮膏", 
                 "護髮、洗面乳、卸妝油", 
                 "髮夾、小髮圈、梳子、髮圈", 
-                "項鍊", // V6.11 修正: 頂讓 -> 項鍊
+                "項鍊", 
                 "內衣、內褲、襪子", 
                 "分裝藥盒、益生菌、保健品", 
                 "帽子",
@@ -919,7 +958,7 @@
 
 
         // =================================================================
-        // 【核心功能 2：行程表 (Itinerary) - V6.11 渲染邏輯】
+        // 【核心功能 2：行程表 (Itinerary) - V6.11 渲染邏輯】(保持不變)
         // =================================================================
         
         // 交通指南/清單 展開/收合功能 (in-card)
@@ -1354,44 +1393,58 @@
         }
         
         // =================================================================
-        // 【核心功能 4：翻譯功能 (Translation) - 保持不變】
+        // 【核心功能 4：翻譯功能 (Translation) - V6.12 修正】
         // =================================================================
         
+        // V6.12 新增：常用翻譯對照表 (Key: 中文輸入, Value: 日文輸出)
+        const TRANSLATION_MAP = {
+            "我要結帳": "お会計をお願いします。",
+            "廁所在哪裡": "トイレはどこですか？",
+            "謝謝": "ありがとうございます。",
+            "太貴了": "それはちょっと高いですね。",
+            "我要大便": "トイレに行きたいです。"
+        };
+
         function isCJK(text) {
+            // 判斷是否包含中日韓文字
             const cjkRegex = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]/; 
             return cjkRegex.test(text);
         }
 
         function translateText() {
-            const inputText = document.getElementById('translate-input').value;
+            const inputText = document.getElementById('translate-input').value.trim();
             const outputElement = document.getElementById('translation-output');
             
-            if (inputText.trim() === '') {
+            if (inputText === '') {
                 outputElement.textContent = "請輸入要翻譯的文字。";
                 outputElement.removeAttribute('data-lang');
                 return;
             }
             
             let translatedText;
+            let targetLang;
             
-            // 由於這是純前端模擬，我們只做簡單的語言判斷和示範翻譯
+            // 由於這是純前端模擬，我們判斷為中文輸入，則模擬翻譯成日文
             if (isCJK(inputText)) {
-                translatedText = `Hello, can I have the bill please.`; 
-                outputElement.setAttribute('data-lang', 'en'); // 模擬翻譯成英文
+                targetLang = 'ja';
+                // 嘗試從對照表取得翻譯，否則使用預設日文
+                translatedText = TRANSLATION_MAP[inputText] || "すみません、これは何ですか？ (不好意思，請問這是什麼？)"; 
             } else {
-                translatedText = `你好，麻煩請結帳。`; 
-                outputElement.setAttribute('data-lang', 'zh'); // 模擬翻譯成中文
+                // 模擬其他語言輸入，則翻譯回中文
+                targetLang = 'zh';
+                translatedText = "不好意思，我不太明白您的意思。";
             }
             
             outputElement.textContent = translatedText;
+            outputElement.setAttribute('data-lang', targetLang);
         }
         
         function speakTranslation() {
             const outputElement = document.getElementById('translation-output');
             const outputText = outputElement.textContent;
             
-            if (outputText.includes("請輸入")) {
-                alert("請先輸入文字並進行翻譯。");
+            if (outputText.includes("請輸入") || outputText.includes("不太明白")) {
+                alert("請先輸入文字並進行翻譯，或翻譯結果無法讀出。");
                 return;
             }
             
@@ -1400,11 +1453,9 @@
                 
                 const targetLang = outputElement.getAttribute('data-lang');
                 if (targetLang === 'ja') {
-                    utterance.lang = 'ja-JP'; 
-                } else if (targetLang === 'en') {
-                    utterance.lang = 'en-US';
+                    utterance.lang = 'ja-JP'; // 日文語音
                 } else {
-                    utterance.lang = 'zh-TW'; 
+                    utterance.lang = 'zh-TW'; // 中文語音
                 }
                 
                 window.speechSynthesis.cancel();
@@ -1415,7 +1466,7 @@
         }
 
         // =================================================================
-        // 【核心功能 5：行李清單 (Packing List) - V6.11 修正進度條】
+        // 【核心功能 5：行李清單 (Packing List) - 保持不變】
         // =================================================================
         
         function togglePackingItem(item, isChecked) {
