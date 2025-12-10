@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKINAWA 快樂遊 | 日系文青風</title>
+    <style>
+        /* CSS 樣式區域：日系文青藍黃風格 V6.11 - 修正與優化版 */
+        
+        /* === 顏色定義 === */
+        :root {
+            --color-primary: #4682b4; /* 日系鋼鐵藍 (主色) */
+            --color-accent-light: #f9f9e0; /* 淺米色/柔和黃 (強調色) */
+            --color-accent-dark: #fffacd; /* 檸檬雪紡 (行程卡片底色) */
+            --color-background: #ffffff;
+            --color-text: #333333;
+            --color-light-gray: #e0e0e0; /* 細線條用 */
+            --color-danger: #dc3545; /* 醒目時間/刪除按鈕用紅色 */
+            --color-card-bg: #fafafa;
+            --color-timeline-line: #cccccc; /* 時間軸線條顏色 */
+            --color-icon: var(--color-primary);
+        }
+
+        /* 1. 全局設定與文青字體 */
+        body {
+            font-family: 'Times New Roman', "serif", "Noto Sans TC", "微軟正黑體", "Microsoft JhengHei", sans-serif; 
+            background-color: var(--color-background);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 60px; /* 底部空間留給導覽列 */
+        }
+        
+        /* 2. 主內容區域 */
+        .container {
+            width: 100%;
+            max-width: 600px; /* 模擬手機寬度 */
+            margin: 0 auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+            padding-top: 25px; 
+            padding-bottom: 80px; 
+            min-height: calc(100vh - 60px);
+        }
+        
+        /* 3. 底部導覽列 (Fixed Bottom Bar) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 100%;
+            max-width: 600px; 
+            background-color: var(--color-background);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+            box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.05); 
+            z-index: 2000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7em; 
+            color: #999999;
+            padding: 5px 0;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--color-primary); 
+            font-weight: bold;
+        }
+        
+        /* 4. 頁面標題與文青風格 */
+        .page-header {
+            background-color: var(--color-background);
+            color: var(--color-text);
+            padding: 0 0 10px 0; 
+            margin: 0 0 20px 0;
+            font-size: 1.8em;
+            font-weight: normal;
+            border-bottom: 1px dashed var(--color-light-gray);
+        }
+
+        /* 5. 功能卡片樣式 */
+        .feature-card {
+            display: none; 
+            background-color: var(--color-background);
+            padding: 0; 
+            margin-bottom: 25px;
+        }
+
+        .feature-card.active {
+            display: block; 
+        }
+        
+        /* --- 行程表 V6.10 導覽與時間軸 CSS (Fixed Header) --- */
+        
+        /* V6.7: 頂部資訊區塊 (固定定位) */
+        #itinerary-header-wrapper {
+             /* 啟用固定定位 */
+             position: sticky;
+             top: 0; /* 固定在最上方 */
+             
+             background-color: var(--color-primary);
+             color: white;
+             padding: 15px;
+             border-radius: 0 0 12px 12px; /* 底部圓角，頂部不圓角 */
+             margin: -25px -15px 0 -15px; /* 擴展到頁面邊緣 */
+             padding-top: 25px; /* 補償頂部距離 */
+             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+             z-index: 1000; /* 確保在行程卡片之上 */
+        }
+        
+        /* V6.7: 在 fixed header 下方的行程列表需要額外 padding */
+        #itinerary-display-container {
+            padding-top: 20px; /* 留出空間，避免內容被固定頂部遮擋 */
+        }
+        
+        /* V6.7: 頂部日期與 Day 顯示，字體放大 */
+        #day-info-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.4em; /* 放大字體 */
+            font-weight: bold;
+        }
+        
+        /* V6.7: 單獨放大 Day N 的字體 */
+        #day-info-display .day-number-text {
+            font-size: 1.2em; /* Day 數字再稍微大一點 */
+            font-weight: bold;
+        }
+        
+        /* 日期選擇器 */
+        #day-selector {
+            display: flex;
+            justify-content: flex-start; 
+            margin-top: 15px;
+            padding: 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            gap: 10px;
+        }
+        
+        /* 日期選擇按鈕 */
+        .day-tab {
+            flex-shrink: 0; 
+            min-width: 60px;
+            padding: 8px 12px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 20px; 
+            transition: background-color 0.2s, color 0.2s;
+            font-size: 0.9em;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: normal;
+        }
+
+        .day-tab.active {
+            background-color: var(--color-accent-dark);
+            color: var(--color-text);
+            font-weight: bold;
+        }
+        
+        /* 行程總容器：相對定位，以便內部使用絕對定位的時間軸線 */
+        #itinerary-display {
+            position: relative;
+            padding-left: 15px; /* 為時間軸線條留出空間 */
+        }
+        
+        /* 時間軸線條 (虛擬元素) */
+        #itinerary-display::before {
+            content: '';
+            position: absolute;
+            left: 20px; /* 垂直線條的 X 軸位置 */
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: var(--color-timeline-line);
+            z-index: 100;
+        }
+
+        /* 行程卡片容器 */
+        .itinerary-card {
+            display: flex;
+            align-items: flex-start;
+            padding: 0; 
+            background-color: transparent;
+            box-shadow: none;
+            margin-bottom: 15px;
+            position: relative;
+            border-left: none;
+        }
+        
+        /* V6.6: 時間軸圓點 (中空環形點) */
+        .card-timeline-icon {
+            position: absolute;
+            left: 20px; 
+            top: 0;
+            width: 12px; 
+            height: 12px;
+            margin-left: -9px; 
+            border-radius: 50%;
+            background-color: var(--color-background); /* White center (hollow) */
+            border: 3px solid var(--color-primary); /* Primary color ring */
+            z-index: 200;
+        }
+        
+        /* 卡片內容 (右側主體) */
+        .card-content-wrapper {
+            flex-grow: 1;
+            background-color: var(--color-card-bg); /* 卡片背景 */
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-left: 45px; /* 留出時間軸和圓點的空間 */
+        }
+        
+        /* Icon 與標題/時間的 Flex 容器 */
+        .card-icon-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px; 
+        }
+        
+        /* V6.6: 行程 Icon 樣式 (高對比/內嵌/圓形) */
+        .itinerary-icon-in-card {
+            font-size: 1.5em; 
+            color: var(--color-primary); 
+            background-color: var(--color-background); 
+            border-radius: 50%;
+            border: 1px solid var(--color-primary); 
+            width: 35px; 
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            flex-shrink: 0; 
+        }
+        
+        /* 標題與時間的容器 */
+        .card-title-time-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 調整時間樣式 */
+        .card-time {
+            font-size: 0.8em;
+            font-weight: normal;
+            color: #999;
+            margin-bottom: 2px;
+            display: block;
+        }
+        
+        /* 調整標題樣式 */
+        .card-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--color-primary); 
+        }
+        
+        /* V6.11: 讓機場和住宿卡片更醒目 (滿足 Day 1/6 要求) */
+        .itinerary-card.type-flight-out .card-title,
+        .itinerary-card.type-flight-in .card-title,
+        .itinerary-card.type-accommodation .card-title {
+            font-size: 1.25em; /* 放大標題 */
+            color: var(--color-primary); 
+        }
+
+        .itinerary-card.type-flight-out .card-time,
+        .itinerary-card.type-flight-in .card-time,
+        .itinerary-card.type-accommodation .card-time {
+            font-size: 0.9em; /* 時間略大一點 */
+            font-weight: bold;
+            color: var(--color-danger); /* 醒目紅色 */
+        }
+
+
+        /* --- 其他樣式 --- */
+        
+        .toggle-guide-btn {
+            background-color: var(--color-accent-light);
+            color: var(--color-text);
+            border: 1px dashed var(--color-primary);
+            padding: 8px 10px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            width: 100%;
+            text-align: left;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .guide-content {
+            display: none;
+            background-color: var(--color-accent-light);
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-size: 0.9em;
+            border: 1px solid var(--color-light-gray);
+        }
+        .guide-content ul {
+            list-style-type: none; 
+            padding-left: 0;
+        }
+        /* V6.7: 用這個類別標記重點文字，取代**符號 */
+        .guide-content .highlight {
+            color: var(--color-primary);
+            font-weight: bold;
+        }
+        .map-link {
+             color: var(--color-primary);
+             font-size: 0.85em;
+             font-weight: bold;
+             display: inline-block;
+             margin-top: 5px;
+        }
+        
+        /* V6.11: 玉泉洞景點流程 - 線性串接 */
+        .flow-container {
+            margin: 10px 0;
+            padding: 10px 10px 0 10px; 
+            border-left: none; 
+            position: relative; 
+        }
+
+        .flow-container::before {
+            content: '';
+            position: absolute;
+            left: 20px; /* 線條位置 */
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--color-primary); /* 主色線條 */
+            opacity: 0.5;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: flex-start; 
+            margin-bottom: 20px;
+            font-size: 0.95em;
+            position: relative;
+            padding-left: 30px; /* 為圓點留出空間 */
+        }
+        
+        .flow-step::before {
+            content: '';
+            position: absolute;
+            left: 17px; /* 圓點位置 */
+            top: 5px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-primary); /* 圓點顏色 */
+            border-radius: 50%;
+            z-index: 10;
+            border: 1px solid white; /* 讓圓點更突出 */
+        }
+
+        .flow-arrow {
+            display: none; /* 移除箭頭圖標 */
+        }
+
+        .flow-item {
+            background-color: #ffffff;
+            border: 1px solid var(--color-light-gray);
+            border-radius: 4px;
+            padding: 5px 10px;
+            flex-grow: 1;
+        }
+
+        .flow-item-highlight {
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+
+        /* 可收合元件 (Collapsible) 通用樣式 */
+        .collapsible-container {
+             margin-bottom: 15px;
+        }
+
+        .collapsible {
+            background-color: white;
+            color: var(--color-primary);
+            cursor: pointer;
+            padding: 12px 15px;
+            width: 100%;
+            border: 1px solid var(--color-primary);
+            text-align: left;
+            outline: none;
+            font-size: 1em;
+            transition: background-color 0.2s;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px; 
+        }
+        
+        /* V6.7 修正破圖問題: 確保 content 區塊也有白色背景 */
+        .collapsible-content {
+            display: none;
+            padding: 15px;
+            background-color: white; /* 確保展開內容有白色背景 */
+            border: 1px solid var(--color-primary);
+            border-top: none; 
+            border-radius: 0 0 8px 8px; 
+        }
+
+        /* 讓巴士小撇步的容器和內容使用白色背景，與頂部藍色區塊區隔 */
+        #itinerary-header-wrapper .collapsible {
+            background-color: white;
+            color: var(--color-primary);
+            border: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        #itinerary-header-wrapper .collapsible-content {
+            background-color: white;
+            border-top: none;
+            color: var(--color-text);
+            font-weight: normal;
+        }
+        
+        /* --- V6.11: 行李清單進度條修正 --- */
+        #packing-progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--color-light-gray);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        #packing-progress-bar-fill {
+            height: 100%;
+            background-color: var(--color-primary);
+            transition: width 0.3s ease-in-out;
+        }
+
+        
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        
+        <section id="itinerary" class="feature-card active">
+            <div class="page-header">📝 OKINAWA 快樂遊 行程</div>
+            
+            <div id="itinerary-header-wrapper">
+                 <div id="day-info-display">
+                    </div>
+                
+                 <div id="weather-card">
+                    </div>
+
+                <div class="collapsible-container" style="margin-top: 15px; margin-bottom: 0;">
+                    <button class="collapsible" onclick="toggleCollapsible(this)">
+                        <span style="font-size: 0.9em;">🚌 搭乘巴士小撇步</span>
+                        <span class="arrow">▶</span>
+                    </button>
+                    <div id="all-day-bus-tips" class="collapsible-content">
+                        <p style="margin: 0; font-size: 0.9em;">
+                            <span class="highlight">上車：</span>前門上車，<span class="highlight">抽整理券</span>。<br>
+                            <span class="highlight">下車：</span>前門下車，依<span class="highlight">整理券號碼</span>顯示的金額<span class="highlight">投現</span>。
+                        </p>
+                    </div>
+                </div>
+                
+                <div id="day-selector">
+                    </div>
+            </div>
+            
+            <div id="itinerary-display-container">
+                 <div id="itinerary-display">
+                    <p style="text-align: center; color: #999;">請選擇上方日期查看行程。</p>
+                </div>
+            </div>
+            
+        </section>
+
+        <section id="accounting" class="feature-card">
+            <div class="page-header">💰 是免稅，不是免費</div>
+            
+            <div style="background-color: var(--color-accent-light); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--color-light-gray);">
+                <p style="margin-top: 0; font-weight: bold;">總支出估算 (TWD)</p>
+                <h1 style="color: var(--color-primary); margin: 0; font-size: 2em;">$ <span id="total-twd">0</span></h1>
+                <p style="font-size: 0.8em; margin-bottom: 0;">匯率參考：1 TWD ≈ <span id="exchange-rate-display">4.5</span> JPY</p>
+            </div>
+
+            <div style="padding: 15px; border: 1px solid var(--color-light-gray); border-radius: 8px;">
+                <p style="margin-top: 0; font-weight: bold;">新增款項</p>
+                
+                <select id="expense-category" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    <option value="飲食">類別：飲食</option>
+                    <option value="交通">類別：交通</option>
+                    <option value="住宿">類別：住宿</option>
+                    <option value="其他">類別：其他</option>
+                </select>
+                
+                <div style="display: flex; gap: 10px;">
+                    <select id="expense-currency" style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="JPY">JPY (日圓)</option>
+                        <option value="TWD">TWD (台幣)</option>
+                    </select>
+                    <input type="number" id="expense-amount" placeholder="金額" style="flex-grow: 2; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    <select id="expense-payer" style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="Devin">Devin</option>
+                        <option value="Meimei">Meimei</option>
+                    </select>
+                </div>
+                
+                <button onclick="addExpense()" style="width: 100%; margin-top: 15px; font-weight: bold;">記一筆</button>
+            </div>
+            
+            <h3 style="color: var(--color-primary); margin-top: 25px; border-bottom: 1px dashed var(--color-light-gray); padding-bottom: 5px;">詳細紀錄</h3>
+            <div id="expense-list">
+                <p style="text-align: center; color: #999;">目前還沒有記帳喔！</p>
+            </div>
+            
+            <button onclick="clearAllExpenses(true)" class="delete-btn" style="width: 100%; margin-top: 15px;">清空所有記帳紀錄</button>
+        </section>
+
+        <section id="translation" class="feature-card">
+            <h3 style="color: var(--color-primary); margin-top: 0;">翻譯結果</h3>
+            
+            <div id="translation-output-wrapper">
+                 <div id="translation-output-container">
+                    <p id="translation-output">[在這裡查看翻譯]</p>
+                </div>
+                 <button onclick="speakTranslation()" class="tts-button">🔊 讀出</button>
+            </div>
+            
+            <div class="page-header" style="margin-top: 0; border-bottom: none;">🗣️ 即時翻譯</div>
+
+            <textarea id="translate-input" placeholder="輸入中文或日文..." rows="4" style="width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;"></textarea>
+            
+            <button onclick="translateText()" style="width: 100%; margin-top: 15px; font-weight: bold;">翻譯</button>
+        </section>
+
+        <section id="packing" class="feature-card">
+             <div class="page-header">📦 行李清單</div>
+            
+            <div id="packing-progress-container" style="margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div style="font-weight: bold; font-size: 1em; color: var(--color-text);">
+                        打包進度
+                    </div>
+                    <div id="progress-text" style="font-weight: bold; font-size: 1.2em; color: var(--color-primary);">
+                        0%
+                    </div>
+                </div>
+                <div id="packing-progress-bar">
+                    <div id="packing-progress-bar-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+            
+            <div id="packing-list">
+                </div>
+        </section>
+
+    </main>
+    
+    <nav class="bottom-nav">
+        <div class="nav-item active" data-page-id="itinerary" onclick="showPage('itinerary')">
+            行程
+        </div>
+        <div class="nav-item" data-page-id="accounting" onclick="showPage('accounting')">
+            記帳
+        </div>
+        <div class="nav-item" data-page-id="translation" onclick="showPage('translation')">
+            翻譯
+        </div>
+        <div class="nav-item" data-page-id="packing" onclick="showPage('packing')">
+            行李清單
+        </div>
+    </nav>
+    
+    <script>
+        
+        // =================================================================
+        // 【核心資料與日期計算】
+        // =================================================================
+        
+        const START_DATE = new Date('2025-12-27T00:00:00');
+        const NUM_DAYS = 6; 
+        const WEEKDAY_NAMES = ["日", "一", "二", "三", "四", "五", "六"];
+
+        function getDateInfo() {
+            const dayInfos = {};
+            for (let i = 0; i < NUM_DAYS; i++) {
+                const currentDate = new Date(START_DATE);
+                currentDate.setDate(START_DATE.getDate() + i);
+                
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                const day = currentDate.getDate().toString().padStart(2, '0');
+                const weekdayIndex = currentDate.getDay(); 
+                
+                dayInfos[`day${i + 1}`] = {
+                    date: `${month}/${day}`,
+                    weekday: `(${WEEKDAY_NAMES[weekdayIndex]})`,
+                    fullDate: currentDate.toISOString().split('T')[0]
+                };
+            }
+            return dayInfos;
+        }
+
+        const DATE_INFOS = getDateInfo();
+        
+        // 模擬天氣資料 
+        const WEATHER_DATA = {
+            "day1": {"city": "那霸", "temp": "19°C / 14°C", "condition": "多雲☁️"},
+            "day2": {"city": "那霸", "temp": "20°C / 15°C", "condition": "晴朗☀️"},
+            "day3": {"city": "那霸", "temp": "18°C / 13°C", "condition": "小雨☔"},
+            "day4": {"city": "那霸", "temp": "21°C / 16°C", "condition": "晴朗☀️"},
+            "day5": {"city": "那霸", "temp": "19°C / 14°C", "condition": "多雲☁️"},
+            "day6": {"city": "那霸", "temp": "20°C / 15°C", "condition": "晴朗☀️"},
+        };
+
+        const ACCOMMODATION_ADDRESS = "1-chōme-12-6 Izumizaki Brillia Building 3/4 Floor, 那霸, Okinawa 900-0021, 日本";
+        
+        // ★★★ V6.11 數據修正：Day 5 & Day 6 內容調整 ★★★
+        const ITINERARY_DATA = {
+            "day1": [
+                {
+                    "time": "18:20",
+                    "title": "出發 桃園機場 Terminal 1",
+                    "details": "虎航 IT 232 班機",
+                    "type": "flight-out",
+                    "map_link": null
+                },
+                {
+                    "time": "20:40",
+                    "title": "抵達 那霸機場 (OKA)",
+                    "details": "入境與領取行李",
+                    "type": "flight-in",
+                    "map_link": null
+                },
+                {
+                    "time": "21:30",
+                    "title": "check in 住宿",
+                    "details": "Izumizaki Brillia Building",
+                    "map_link": `https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(ACCOMMODATION_ADDRESS)}`,
+                    "type": "accommodation"
+                }
+            ],
+            "day2": [
+                {
+                    "time": "09:00",
+                    "title": "早餐：住宿附近",
+                    "details": "預計料理選項：吐司 / 傳早 (在地早餐店)",
+                    "type": "food",
+                    "map_link": null 
+                },
+                {
+                    "time": "10:30",
+                    "title": "港川外人住宅區 (浦添市)",
+                    "details": "文青散步區 & 交通指南",
+                    "type": "attraction",
+                    "map_link": null,
+                    "special_content": "port_kawagoe_guide" 
+                },
+                {
+                    "time": "11:30",
+                    "title": "咖啡：Okinawa Cerrado Coffee",
+                    "details": "午餐前來杯沖繩在地咖啡",
+                    "type": "food",
+                    "map_link": "https://maps.app.goo.gl/azkPSq6w3V3RwYYdA" 
+                },
+                {
+                    "time": "13:00",
+                    "title": "午餐：二選一 (港川外人住宅區)",
+                    "details": "多選項餐廳選擇",
+                    "type": "food",
+                    "map_link_cocoroar": "https://maps.app.goo.gl/SDKUrMGM9vPrL9FM8",
+                    "map_link_soba": "https://maps.app.goo.gl/aTz737y92zkoa65Z7",
+                    "special_content": "lunch_options" 
+                },
+                {
+                    "time": "16:00",
+                    "title": "Parco City 逛街購物 & 晚餐",
+                    "details": "一站式購物中心，晚餐於美食街解決",
+                    "type": "shopping",
+                    "map_link": "https://maps.app.goo.gl/jhCSNGzVXzJ97sMZ9",
+                    "special_content": "parco_shopping_list" 
+                }
+            ],
+            "day3": [ 
+                {
+                    "time": "10:00",
+                    "title": "瀨長島 (Umikaji Terrace)",
+                    "details": "白色海岸線購物區，早午餐預計在這邊解決。",
+                    "type": "attraction",
+                    "map_link": null,
+                    "special_content": "senaga_guide_food" 
+                },
+                {
+                    "time": "14:00", 
+                    "title": "ASHIBINAA Outlet",
+                    "details": "沖繩最大的 Outlet，主要購物行程。",
+                    "type": "shopping",
+                    "map_link": "https://maps.app.goo.gl/LsDVuPmAvtzR6QBo7",
+                    "special_content": "ashibinaa_guide_v69" 
+                },
+                {
+                    "time": "18:30",
+                    "title": "晚餐：回那霸市區",
+                    "details": "Tonton Jacky Pork 或 Ocean BOO! Naha 二選一",
+                    "type": "food",
+                    "map_link_jacky": "https://maps.app.goo.gl/YozNc7rHNt3gjG6D6",
+                    "map_link_ocean": "https://maps.app.goo.gl/cXxMJVYCfynbdjDs9",
+                    "special_content": "naha_dinner_v69" 
+                }
+            ],
+            "day4": [
+                 {
+                    "time": "09:00",
+                    "title": "早餐：牧志市場附近",
+                    "details": "C&C Breakfast 或 花商 花生豆腐專門店 二選一",
+                    "type": "food",
+                    "map_link_cc": "https://maps.app.goo.gl/cgUXMWDkL4sXJpEa9",
+                    "map_link_tofu": "https://maps.app.goo.gl/eHeN4tY6qwUdcwmX9",
+                    "special_content": "makishi_breakfast"
+                },
+                {
+                    "time": "10:30",
+                    "title": "第一牧志公設市場",
+                    "details": "探索沖繩在地生活氣息，午餐在市場內解決。",
+                    "type": "attraction",
+                    "map_link": null,
+                    "special_content": "makishi_market_guide"
+                },
+                 {
+                    "time": "14:00",
+                    "title": "Sports Depo Ameku",
+                    "details": "運動用品店，尋找日系運動品牌。",
+                    "type": "shopping",
+                    "map_link": "https://maps.app.goo.gl/9rkWnLKcxSMPtrwXA",
+                    "special_content": null
+                },
+                {
+                    "time": "16:00",
+                    "title": "美國村 (Mihama American Village)",
+                    "details": "沖繩的異國風情，有購物、美食和海景。",
+                    "type": "attraction",
+                    "map_link": null,
+                    "special_content": "american_village_guide_v69" 
+                },
+                {
+                    "time": "18:30",
+                    "title": "晚餐：美國村內選項",
+                    "details": "迴轉壽司、居酒屋或沖繩麵擇一。",
+                    "type": "food",
+                    "map_link_sushi": "https://maps.app.goo.gl/hYcvp9bzpJN4Fwb8A",
+                    "map_link_izakaya": "https://maps.app.goo.gl/n9QtBBcvZ6EHPxv37",
+                    "map_link_soba": "https://maps.app.goo.gl/8u9io86oW2Smw1dFA",
+                    "special_content": "american_village_dinner_v69" 
+                }
+            ],
+            "day5": [
+                 {
+                    "time": "09:00",
+                    "title": "早餐：住宿附近",
+                    "details": "預計料理選項：吐司 / 傳早 (在地早餐店)",
+                    "type": "food",
+                    "map_link": null 
+                },
+                {
+                    "time": "10:30",
+                    "title": "玉泉洞 & 沖繩世界",
+                    "details": "感受沖繩王國村的自然景觀與琉球文化。",
+                    "type": "attraction",
+                    "map_link": "https://www.google.com/maps/search/首里城2",
+                    "special_content": "gyokusendo_guide_v610" // V6.11: 玉泉洞行程流程
+                },
+                {
+                    "time": "15:00",
+                    "title": "國際通 (Kokusai Street)",
+                    "details": "那霸市最繁華的街道，進行最終採買！",
+                    "type": "shopping",
+                    "map_link": "https://www.google.com/maps/search/首里城3",
+                    "special_content": "kokusai_street_guide" // V6.10: 必買清單
+                },
+                 {
+                    "time": "18:30",
+                    "title": "晚餐：遺珠餐廳或特色料理",
+                    "details": "將前幾天沒吃到的餐廳排進來。",
+                    "type": "food",
+                    "map_link": null,
+                    "special_content": null
+                }
+            ],
+            "day6": [
+                {
+                    "time": "07:30",
+                    "title": "check out 住宿",
+                    "details": "打包行李，準備前往機場。",
+                    "type": "accommodation",
+                    "map_link": null
+                },
+                {
+                    "time": "09:45",
+                    "title": "出發 那霸機場 (OKA)",
+                    "details": "虎航 IT 231 班機",
+                    "type": "flight-out",
+                    "map_link": null
+                },
+                {
+                    "time": "10:20",
+                    "title": "抵達 桃園機場 Terminal 1",
+                    "details": "旅程圓滿結束！",
+                    "type": "flight-in",
+                    "map_link": null
+                }
+            ]
+        };
+        
+        // V6.11: 行李清單資料 (修正「項鍊」)
+        const packingList = {
+            "行前": [
+                "機場接送", 
+                "機票選位報到", 
+                "旅平險不便險", 
+                "esim", 
+                "visit Japan"
+            ],
+            "隨身": [
+                "護照/身份證", 
+                "日常、信用卡", 
+                "手機充電器、行動電源", 
+                "錢包", 
+                "手錶", 
+                "電子書", 
+                "文件影印(護照、身分證、機票)",
+                "大頭貼",
+                "水壺",
+                "環保袋",
+                "電腦、充電線",
+                "墨鏡",
+                "暈船藥",
+                "吸的",
+                "雨傘"
+            ],
+            "行李箱": [
+                "個人藥品(血壓、止痛、胃藥、止癢、防蚊液)", 
+                "口罩 / 耳塞", 
+                "牙膏、牙刷、維持器", 
+                "保養品、面膜、護髮膏", 
+                "護髮、洗面乳、卸妝油", 
+                "髮夾、小髮圈、梳子、髮圈", 
+                "項鍊", // V6.11 修正: 頂讓 -> 項鍊
+                "內衣、內褲、襪子", 
+                "分裝藥盒、益生菌、保健品", 
+                "帽子",
+                "衣服、毛巾", 
+                "電腦、充電線", 
+                "泡澡球",
+                "化妝包"
+            ],
+        };
+        
+        // Icon 對應表 (保持不變)
+        const ITINERARY_ICONS = {
+            "flight-out": "✈️",
+            "flight-in": "🛬",
+            "accommodation": "🏨",
+            "food": "🍽️",
+            "attraction": "📍",
+            "shopping": "🛍️",
+            "default": "○"
+        };
+
+
+        // 記帳相關變數與匯率 (保持不變)
+        let expenses = []; 
+        const EXCHANGE_RATE_TWD_TO_JPY = 4.5; 
+
+        // =================================================================
+        // 【核心功能 1：頁面切換邏輯】(保持不變)
+        // =================================================================
+        let activePageId = 'itinerary';
+        function showPage(pageId) {
+            activePageId = pageId;
+            const pages = document.querySelectorAll('.feature-card');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page-id') === pageId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            window.scrollTo(0, 0); 
+            
+            if (pageId === 'itinerary' && !document.querySelector('.day-tab.active')) {
+                showItinerary('day1');
+            }
+        }
+
+
+        // =================================================================
+        // 【核心功能 2：行程表 (Itinerary) - V6.11 渲染邏輯】
+        // =================================================================
+        
+        // 交通指南/清單 展開/收合功能 (in-card)
+        function toggleGuide(button, contentId) {
+            const content = document.getElementById(contentId);
+            const buttonText = button.textContent.includes("交通指南") ? "交通指南" : (button.textContent.includes("必逛清單") ? "🛍️ 必逛清單" : "清單"); 
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                button.textContent = `${buttonText} (點擊展開)`;
+            } else {
+                content.style.display = "block";
+                button.textContent = `${buttonText} (點擊收合)`;
+            }
+        }
+
+        // 通用可收合元件 (collapsible) 展開/收合功能 (for Bus Tips & Packing List)
+        function toggleCollapsible(button) {
+            button.classList.toggle('active');
+            const content = button.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+        
+        function renderDaySelectors() {
+            const selectorContainer = document.getElementById('day-selector');
+            selectorContainer.innerHTML = '';
+            
+            Object.keys(DATE_INFOS).forEach(dayKey => {
+                const info = DATE_INFOS[dayKey];
+                const button = document.createElement('div');
+                button.className = 'day-tab';
+                button.textContent = `Day ${dayKey.slice(3)}`;
+                button.onclick = () => showItinerary(dayKey); 
+                selectorContainer.appendChild(button);
+            });
+            
+            // 預設選中 Day 1，但如果用戶先前有選擇，則保持選擇
+            const defaultDay = localStorage.getItem('activeDay') || 'day1';
+            showItinerary(defaultDay);
+        }
+
+        function renderWeatherCard(dayKey) {
+             const dayInfoDisplay = document.getElementById('day-info-display');
+             const weatherCard = document.getElementById('weather-card');
+             const info = DATE_INFOS[dayKey];
+             const weather = WEATHER_DATA[dayKey];
+             
+             // V6.7: 更新頂部日期顯示 (字體放大)
+             dayInfoDisplay.innerHTML = `
+                 <span style="font-weight: normal;">${info.date} ${info.weekday}</span>
+                 <span class="day-number-text">Day ${dayKey.slice(3)}</span>
+             `;
+             
+             // 更新天氣卡片
+             weatherCard.innerHTML = `
+                <div class="weather-info">
+                    <div class="weather-condition">${weather.condition}</div>
+                    <div style="font-size: 0.8em; font-weight: normal;">${weather.city} / (模擬數據)</div>
+                </div>
+                <div class="weather-temp">
+                    ${weather.temp}
+                </div>
+             `;
+        }
+
+
+        function showItinerary(selectedDayKey) {
+            const displayArea = document.getElementById('itinerary-display');
+            const dayTabs = document.querySelectorAll('.day-tab');
+            
+            // 1. 儲存並更新選單樣式
+            localStorage.setItem('activeDay', selectedDayKey);
+            dayTabs.forEach((tab, index) => {
+                tab.classList.remove('active');
+                if (`day${index + 1}` === selectedDayKey) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // 2. 更新天氣卡片
+            renderWeatherCard(selectedDayKey);
+
+            // 3. 渲染行程列表
+            const dayItinerary = ITINERARY_DATA[selectedDayKey] || [];
+            
+            let htmlContent = '';
+            if (dayItinerary.length === 0) {
+                htmlContent = `<p style="text-align: center; color: #999; padding: 20px;">Day ${selectedDayKey.slice(3)} 尚無行程規劃。</p>`;
+            } else {
+                 dayItinerary.forEach((item, index) => {
+                    let detailsHtml;
+                    let mapLinkHtml = '';
+                    
+                    // 根據類型判斷是否顯示時間 (機場/住宿顯示時間)
+                    const showTime = item.type.includes('flight') || item.type.includes('accommodation'); 
+                    const timeHtml = showTime ? `<span class="card-time">${item.time}</span>` : '';
+                    
+                    // 取得 Icon
+                    const icon = ITINERARY_ICONS[item.type] || ITINERARY_ICONS.default;
+
+                    // Icon 在卡片內，與時間/標題組合
+                    const iconHtml = `<div class="itinerary-icon-in-card">${icon}</div>`;
+                    const titleTimeGroup = `
+                        <div class="card-title-time-group">
+                            ${timeHtml}
+                            <div class="card-title">${item.title}</div>
+                        </div>
+                    `;
+                    const iconTitleHtml = `
+                        <div class="card-icon-wrapper">
+                            ${iconHtml}
+                            ${titleTimeGroup}
+                        </div>
+                    `;
+
+
+                    // ★★★ 特殊內容處理邏輯 V6.11 修正玉泉洞流程圖 ★★★
+                    if (item.special_content === "port_kawagoe_guide") {
+                         detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0;">${item.details}</p>
+                                <button class="toggle-guide-btn" onclick="toggleGuide(this, 'port-guide-${selectedDayKey}-${index}')">
+                                    交通指南 (點擊展開)
+                                </button>
+                                <div id="port-guide-${selectedDayKey}-${index}" class="guide-content">
+                                    <p><span class="highlight">大眾交通指南：</span></p>
+                                    <ol style="font-size: 0.9em;">
+                                        <li>單軌電車「旭橋站」2號出口的「那霸巴士總站」轉乘巴士120（往名護）約15分鐘至「第二城間站」。</li>
+                                        <li>在那霸機場搭乘單軌電車到旭橋站，前往位於2號出口的公車總站，搭乘<span class="highlight">28號、29號</span>在<span class="highlight">第二城間站</span>（大謝名向）下車，港川外人住宅就位於浦添文化會館及加油站中間。</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.special_content === "lunch_options") {
+                         detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0; font-weight: bold; color: var(--color-primary);">午餐選項：</p>
+                                <p style="margin: 5px 0 0 0;">選項 1: Cocoroar (麵包)</p>
+                                <a href="${item.map_link_cocoroar}" target="_blank" class="map-link">Cocoroar 地圖 ↗</a>
+                                <p style="margin: 10px 0 0 0;">選項 2: 雞湯蕎麥麵屋 (沖繩麵)</p>
+                                <a href="${item.map_link_soba}" target="_blank" class="map-link">雞湯蕎麥麵屋 地圖 ↗</a>
+                            </div>
+                        `;
+                    } else if (item.special_content === "parco_shopping_list") { 
+                        detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0;">${item.details}</p>
+                                <button class="toggle-guide-btn" onclick="toggleGuide(this, 'shopping-list-${selectedDayKey}-${index}')">
+                                    清單 (點擊展開)
+                                </button>
+                                <div id="shopping-list-${selectedDayKey}-${index}" class="guide-content">
+                                    <p><span class="highlight">必逛店鋪：</span></p>
+                                    <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                                        <li><span class="highlight">✓</span> Uniqlo</li>
+                                        <li><span class="highlight">✓</span> niko and</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.special_content === "senaga_guide_food") { 
+                        detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0;">${item.details}</p>
+                                <p style="margin: 10px 0 0 0; font-weight: bold; color: var(--color-primary);">早午餐選項：</p>
+                                <ul style="margin: 5px 0 10px 0; padding-left: 20px;">
+                                    <li>幸福鬆餅 <a href="https://maps.app.goo.gl/q3QJ7NZhXAnaiPSE8" target="_blank" class="map-link">地圖 ↗</a></li>
+                                    <li>Taco Rice <a href="https://maps.app.goo.gl/AYQX2vmuh6sEyApX6" target="_blank" class="map-link">地圖 ↗</a></li>
+                                </ul>
+                                <button class="toggle-guide-btn" onclick="toggleGuide(this, 'senaga-guide-${selectedDayKey}-${index}')">
+                                    交通指南 (點擊展開)
+                                </button>
+                                <div id="senaga-guide-${selectedDayKey}-${index}" class="guide-content">
+                                    <p><span class="highlight">交通指南：</span></p>
+                                    <p style="margin: 5px 0 10px 0;">從國際通要到瀨長島，請在<span class="highlight">【国際通り入口】</span>站牌搭乘<span class="highlight">東京巴士TK02</span>。</p>
+                                    <p style="margin: 5px 0 0 0;"><span class="highlight">回程：</span> TK02 B線繼續往下走，回國際通請注意搭乘<span class="highlight">【TK02 A】</span>。</p>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.special_content === "ashibinaa_guide_v69") { 
+                        detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0;">${item.details}</p>
+                                <button class="toggle-guide-btn" onclick="toggleGuide(this, 'ashibinaa-guide-${selectedDayKey}-${index}')">
+                                    交通指南 (點擊展開)
+                                </button>
+                                <div id="ashibinaa-guide-${selectedDayKey}-${index}" class="guide-content">
+                                    <p><span class="highlight">交通指南：</span></p>
+                                    <ul style="margin: 5px 0 10px 0; padding-left: 20px;">
+                                        <li><span class="highlight">OutLet</span>名稱：アウトレットモールあしびなー</li>
+                                        <li><span class="highlight">那霸巴士總站：</span> 琉球巴士<span class="highlight">55、56、98</span>號直達，約30分鐘。</li>
+                                    </ul>
+                                </div>
+                                
+                                <button class="toggle-guide-btn" onclick="toggleGuide(this, 'ashibinaa-shopping-${selectedDayKey}-${index}')">
+                                       🛍️ 必逛清單 (點擊展開)
+                                </button>
+                                <div id="ashibinaa-shopping-${selectedDayKey}-${index}" class="guide-content">
+                                    <p><span class="highlight">必逛清單：</span></p>
+                                    <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                                        <li><span class="highlight">✓</span> Beams</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.special_content === "naha_dinner_v69") { 
+                        detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0; font-weight: bold; color: var(--color-primary);">晚餐選項：</p>
+                                <p style="margin: 5px 0 0 0;">選項 1: Tonton Jacky Pork (炸豬排)</p>
+                                <a href="${item.map_link_jacky}" target="_blank" class="map-link">Tonton Jacky Pork 地圖 ↗</a>
+                                <p style="margin: 10px 0 0 0;">選項 2: Ocean BOO! Naha (阿古豬火鍋)</p>
+                                <a href="${item.map_link_ocean}" target="_blank" class="map-link">Ocean BOO! Naha 地圖 ↗</a>
+                            </div>
+                        `;
+                    } else if (item.special_content === "makishi_breakfast") { 
+                         detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0; font-weight: bold; color: var(--color-primary);">早餐選項：</p>
+                                <p style="margin: 5px 0 0 0;">選項 1: C&C Breakfast (鬆餅/早午餐)</p>
+                                <a href="${item.map_link_cc}" target="_blank" class="map-link">C&C 地圖 ↗</a>
+                                <p style="margin: 10px 0 0 0;">選項 2: 花商 花生豆腐專門店 (特色)</p>
+                                <a href="${item.map_link_tofu}" target="_blank" class="map-link">花生豆腐 地圖 ↗</a>
+                            </div>
+                        `;
+                    } else if (item.special_content === "makishi_market_guide") { 
+                        detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0;">${item.details}</p>
+                                <p style="margin: 10px 0 0 0; font-weight: bold; color: var(--color-primary);">小提醒：</p>
+                                <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                                    <li>市場內的海鮮攤販可購買後上二樓請店家代客料理。</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else if (item.special_content === "american_village_guide_v69") { 
+                        detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0;">${item.details}</p>
+                                <p style="margin: 10px 0 0 0; font-weight: bold; color: var(--color-primary);">午茶建議：</p>
+                                <p style="margin: 5px 0 10px 0;">熱狗 <a href="https://maps.app.goo.gl/3RNxXuDjLpsUhi5J7" target="_blank" class="map-link">地圖 ↗</a></p>
+                                
+                                <button class="toggle-guide-btn" onclick="toggleGuide(this, 'american-village-guide-${selectedDayKey}-${index}')">
+                                    交通指南 (點擊展開)
+                                </button>
+                                <div id="american-village-guide-${selectedDayKey}-${index}" class="guide-content">
+                                    <p><span class="highlight">巴士路線：</span></p>
+                                    <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                                        <li>那霸巴士總站 <span class="highlight">3號月台 (28號)</span> 或 <span class="highlight">11號月台 (20號)</span> 上車。</li>
+                                        <li>或搭乘 <span class="highlight">120號</span> 或 <span class="highlight">TK05</span>。</li>
+                                        <li>下車站牌：<span class="highlight">美濱美國村入口站</span>。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.special_content === "american_village_dinner_v69") { 
+                         detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0; font-weight: bold; color: var(--color-primary);">晚餐選項：</p>
+                                <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                                    <li><span class="highlight">美食廣場迴轉壽司</span>（迴轉壽司）<a href="${item.map_link_sushi}" target="_blank" class="map-link">地圖 ↗</a></li>
+                                    <li><span class="highlight">居酒屋ちょい</span>（居酒屋）<a href="${item.map_link_izakaya}" target="_blank" class="map-link">地圖 ↗</a></li>
+                                    <li><span class="highlight">浜屋そば</span>（沖繩麵）<a href="${item.map_link_soba}" target="_blank" class="map-link">地圖 ↗</a></li>
+                                </ul>
+                            </div>
+                        `;
+                    } else if (item.special_content === "gyokusendo_guide_v610") { // V6.11 玉泉洞流程圖
+                        detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0;">${item.details}</p>
+                                <p style="margin: 10px 0 0 0; font-weight: bold; color: var(--color-primary);">建議參觀順序：</p>
+                                <div class="flow-container">
+                                    <div class="flow-step"><span class="flow-item"><span class="flow-item-highlight">玉泉洞</span> (從正門進入)</span></div>
+                                    <div class="flow-step"><span class="flow-item">王國村深處：<span class="flow-item-highlight">熱帶水果園</span></span></div>
+                                    <div class="flow-step"><span class="flow-item">沿路體驗：琉球工藝 (玻璃、紅型染等)</span></div>
+                                    <div class="flow-step"><span class="flow-item">購物區：名產店 or <span class="flow-item-highlight">南都造酒所</span></span></div>
+                                    <div class="flow-step"><span class="flow-item">時間充裕：<span class="flow-item-highlight">毒蛇博物公園</span></span></div>
+                                </div>
+                                <button class="toggle-guide-btn" onclick="toggleGuide(this, 'gyokusendo-guide-${selectedDayKey}-${index}')">
+                                    交通指南 (點擊展開)
+                                </button>
+                                <div id="gyokusendo-guide-${selectedDayKey}-${index}" class="guide-content">
+                                    <p><span class="highlight">巴士路線：</span></p>
+                                    <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                                        <li>那霸巴士總站：搭乘<span class="highlight">琉球巴士54號或83號</span>至<span class="highlight">玉泉洞前</span>下車。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    } else if (item.special_content === "kokusai_street_guide") { // V6.10 國際通
+                         detailsHtml = `
+                            <div class="card-details">
+                                <p style="margin: 0;">${item.details}</p>
+                                <button class="toggle-guide-btn" onclick="toggleGuide(this, 'kokusai-shopping-${selectedDayKey}-${index}')">
+                                       🛍️ 必買清單 (點擊展開)
+                                </button>
+                                <div id="kokusai-shopping-${selectedDayKey}-${index}" class="guide-content">
+                                    <p><span class="highlight">必買店鋪：</span></p>
+                                    <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                                        <li><span class="highlight">✓</span> 大國藥妝</li>
+                                        <li>伴手禮店</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    else {
+                        // 標準內容渲染 
+                        detailsHtml = `<div class="card-details">${item.details}</div>`;
+                        if (item.map_link) {
+                            mapLinkHtml = `<a href="${item.map_link}" target="_blank" class="map-link">點擊開啟 Google 地圖 ↗</a>`;
+                        }
+                    }
+                    // ★★★ 特殊內容處理邏輯 End ★★★
+                    
+                    // 組合最終卡片 HTML
+                    htmlContent += `
+                        <div class="itinerary-card type-${item.type}">
+                            <div class="card-timeline-icon"></div> <div class="card-content-wrapper">
+                                ${iconTitleHtml} ${detailsHtml}
+                                ${mapLinkHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            displayArea.innerHTML = htmlContent;
+        }
+
+
+        // =================================================================
+        // 【核心功能 3：記帳功能 (Accounting) - 保持不變】
+        // =================================================================
+        
+        function loadExpenses() {
+            const storedExpenses = localStorage.getItem('travelExpenses');
+            if (storedExpenses) {
+                expenses = JSON.parse(storedExpenses);
+            }
+            renderExpenseList();
+            updateExpenseSummary();
+        }
+
+        function addExpense() {
+            const category = document.getElementById('expense-category').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            const currency = document.getElementById('expense-currency').value;
+            const payer = document.getElementById('expense-payer').value;
+            
+            const now = new Date();
+            const dateStr = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}`;
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert("請輸入有效的金額！");
+                return;
+            }
+
+            const newExpense = { id: Date.now(), date: dateStr, category, amount, currency, payer };
+            expenses.push(newExpense);
+            
+            localStorage.setItem('travelExpenses', JSON.stringify(expenses));
+            
+            document.getElementById('expense-amount').value = '';
+
+            renderExpenseList();
+            updateExpenseSummary();
+        }
+        
+        function deleteExpense(expenseId) {
+            if (!confirm("確定要刪除這筆紀錄嗎？")) return;
+            expenses = expenses.filter(exp => exp.id !== expenseId);
+            localStorage.setItem('travelExpenses', JSON.stringify(expenses));
+            renderExpenseList();
+            updateExpenseSummary();
+        }
+
+        function clearAllExpenses(showConfirmation = false) {
+            if (showConfirmation) {
+                 if (!confirm("確定要清空所有記帳紀錄嗎？此操作不可復原！")) return;
+            }
+            expenses = [];
+            localStorage.removeItem('travelExpenses');
+            alert("所有記帳紀錄已清除！");
+            renderExpenseList();
+            updateExpenseSummary();
+        }
+
+        function renderExpenseList() {
+            const listContainer = document.getElementById('expense-list');
+            if (expenses.length === 0) {
+                listContainer.innerHTML = '<p style="text-align: center; color: #999; margin-top: 20px;">目前還沒有記帳喔！</p>';
+                return;
+            }
+            
+            const sortedExpenses = [...expenses].sort((a, b) => b.id - a.id);
+
+            let html = '<ul style="list-style: none; padding: 0;">';
+            sortedExpenses.forEach(exp => {
+                html += `
+                    <li style="border-bottom: 1px dashed var(--color-light-gray); padding: 10px 0; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="flex-grow: 2; text-align: left; font-size: 0.9em;">
+                            <span style="font-weight: bold;">${exp.date}</span> ${exp.category}
+                        </span>
+                        <span style="flex-grow: 1; text-align: center; font-size: 0.9em;">
+                            ${exp.payer}
+                        </span>
+                        <span style="flex-grow: 2; text-align: right; font-weight: bold; font-size: 1em; color: ${exp.currency === 'JPY' ? 'var(--color-primary)' : 'var(--color-text)'};">
+                            ${exp.amount.toFixed(0)} ${exp.currency}
+                        </span>
+                        <button class="delete-btn" onclick="deleteExpense(${exp.id})" style="flex-shrink: 0; margin-left: 10px;">X</button>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            listContainer.innerHTML = html;
+        }
+
+        function updateExpenseSummary() {
+            let totalTWD = 0;
+            expenses.forEach(exp => {
+                if (exp.currency === 'JPY') {
+                    totalTWD += exp.amount / EXCHANGE_RATE_TWD_TO_JPY;
+                } else if (exp.currency === 'TWD') {
+                    totalTWD += exp.amount;
+                }
+            });
+            document.getElementById('total-twd').textContent = totalTWD.toFixed(0); 
+            document.getElementById('exchange-rate-display').textContent = EXCHANGE_RATE_TWD_TO_JPY;
+        }
+        
+        // =================================================================
+        // 【核心功能 4：翻譯功能 (Translation) - 保持不變】
+        // =================================================================
+        
+        function isCJK(text) {
+            const cjkRegex = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]/; 
+            return cjkRegex.test(text);
+        }
+
+        function translateText() {
+            const inputText = document.getElementById('translate-input').value;
+            const outputElement = document.getElementById('translation-output');
+            
+            if (inputText.trim() === '') {
+                outputElement.textContent = "請輸入要翻譯的文字。";
+                outputElement.removeAttribute('data-lang');
+                return;
+            }
+            
+            let translatedText;
+            
+            // 由於這是純前端模擬，我們只做簡單的語言判斷和示範翻譯
+            if (isCJK(inputText)) {
+                translatedText = `Hello, can I have the bill please.`; 
+                outputElement.setAttribute('data-lang', 'en'); // 模擬翻譯成英文
+            } else {
+                translatedText = `你好，麻煩請結帳。`; 
+                outputElement.setAttribute('data-lang', 'zh'); // 模擬翻譯成中文
+            }
+            
+            outputElement.textContent = translatedText;
+        }
+        
+        function speakTranslation() {
+            const outputElement = document.getElementById('translation-output');
+            const outputText = outputElement.textContent;
+            
+            if (outputText.includes("請輸入")) {
+                alert("請先輸入文字並進行翻譯。");
+                return;
+            }
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(outputText);
+                
+                const targetLang = outputElement.getAttribute('data-lang');
+                if (targetLang === 'ja') {
+                    utterance.lang = 'ja-JP'; 
+                } else if (targetLang === 'en') {
+                    utterance.lang = 'en-US';
+                } else {
+                    utterance.lang = 'zh-TW'; 
+                }
+                
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("抱歉，您的瀏覽器不支持語音播放功能。");
+            }
+        }
+
+        // =================================================================
+        // 【核心功能 5：行李清單 (Packing List) - V6.11 修正進度條】
+        // =================================================================
+        
+        function togglePackingItem(item, isChecked) {
+            const checkedItems = JSON.parse(localStorage.getItem('packingChecked')) || {};
+            checkedItems[item] = isChecked;
+            localStorage.setItem('packingChecked', JSON.stringify(checkedItems));
+            updateProgress(); 
+        }
+
+        function renderPackingList() {
+            const listContainer = document.getElementById('packing-list');
+            listContainer.innerHTML = '';
+            const checkedItems = JSON.parse(localStorage.getItem('packingChecked')) || {};
+            
+            for (const category in packingList) {
+                let categoryHtml = `
+                    <div class="collapsible-container">
+                        <button class="collapsible" onclick="toggleCollapsible(this)">
+                            ${category}
+                            <span class="arrow">▶</span>
+                        </button>
+                        <div class="collapsible-content">
+                `;
+                packingList[category].forEach(item => {
+                    const isChecked = checkedItems[item] ? 'checked' : ''; 
+                    categoryHtml += `
+                        <div style="margin-bottom: 10px;">
+                            <input type="checkbox" id="item-${item}" style="margin-right: 5px;" 
+                                   ${isChecked} 
+                                   onclick="togglePackingItem('${item}', this.checked)"> 
+                            <label for="item-${item}">${item}</label>
+                        </div>
+                    `;
+                });
+                categoryHtml += `
+                        </div>
+                    </div>
+                `;
+                listContainer.innerHTML += categoryHtml;
+            }
+        }
+
+        function updateProgress() {
+            const checkedItems = JSON.parse(localStorage.getItem('packingChecked')) || {};
+            const progressTextElement = document.getElementById('progress-text');
+            const progressBarFillElement = document.getElementById('packing-progress-bar-fill');
+
+            let totalItems = 0;
+            let checkedCount = 0;
+
+            for (const category in packingList) {
+                packingList[category].forEach(item => {
+                    totalItems++;
+                    if (checkedItems[item]) {
+                        checkedCount++;
+                    }
+                });
+            }
+
+            const progress = totalItems === 0 ? 0 : Math.round((checkedCount / totalItems) * 100);
+
+            progressTextElement.textContent = `${progress}%`;
+            progressBarFillElement.style.width = `${progress}%`;
+        }
+
+
+        // =================================================================
+        // 【網站載入初始化】
+        // =================================================================
+        window.onload = function() {
+            showPage('itinerary'); 
+            renderDaySelectors(); 
+            
+            renderPackingList(); 
+            updateProgress(); 
+            loadExpenses(); 
+        }
+
+    </script>
+</body>
+</html>
