@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OKINAWA 快樂遊 | 日系文青風</title>
     <style>
-        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.12 - 翻譯功能修正版 */
+        /* CSS 樣式區域：日系鋼鐵藍黃風格 V6.13 - 翻譯功能最終修正版 */
         
         /* === 顏色定義 === */
         :root {
@@ -299,7 +299,7 @@
             transition: width 0.3s ease-in-out;
         }
         
-        /* --- V6.12 翻譯區塊反轉修正 --- */
+        /* --- V6.13 翻譯區塊反轉修正 (最終版) --- */
         #translation-output-wrapper {
             display: flex;
             gap: 10px;
@@ -312,7 +312,7 @@
             padding: 15px;
             border-radius: 8px;
             /* 核心反轉：將整個容器旋轉 180 度 */
-            transform: rotate(180deg); 
+            transform: rotate(180deg) !important; /* 強制執行 */
             transition: transform 0.3s;
             display: flex;
             align-items: center; /* 讓文字垂直置中 */
@@ -326,7 +326,7 @@
             text-align: center;
             /* 將文字內容旋轉回來，使其在反轉的容器中呈現正向 */
             display: inline-block;
-            transform: rotate(-180deg);
+            transform: rotate(-180deg) !important; /* 強制執行 */
         }
 
         .tts-button {
@@ -670,7 +670,7 @@
         const ACCOMMODATION_ADDRESS = "1-chōme-12-6 Izumizaki Brillia Building 3/4 Floor, 那霸, Okinawa 900-0021, 日本";
         
         const ITINERARY_DATA = {
-            // ... (行程數據保持不變) ...
+            // ... (行程數據保持不變，與 V6.12 相同) ...
             "day1": [
                 {
                     "time": "18:20",
@@ -865,7 +865,7 @@
             ]
         };
         
-        // V6.11: 行李清單資料 (修正「項鍊」)
+        // V6.11: 行李清單資料 
         const packingList = {
             "行前": [
                 "機場接送", 
@@ -1393,16 +1393,17 @@
         }
         
         // =================================================================
-        // 【核心功能 4：翻譯功能 (Translation) - V6.12 修正】
+        // 【核心功能 4：翻譯功能 (Translation) - V6.13 修正】
         // =================================================================
         
-        // V6.12 新增：常用翻譯對照表 (Key: 中文輸入, Value: 日文輸出)
+        // V6.13 修正：新增「你好」翻譯，並調整通用預設回覆
         const TRANSLATION_MAP = {
             "我要結帳": "お会計をお願いします。",
             "廁所在哪裡": "トイレはどこですか？",
             "謝謝": "ありがとうございます。",
             "太貴了": "それはちょっと高いですね。",
-            "我要大便": "トイレに行きたいです。"
+            "我要大便": "トイレに行きたいです。",
+            "你好": "こんにちは。" // V6.13 新增
         };
 
         function isCJK(text) {
@@ -1427,8 +1428,8 @@
             // 由於這是純前端模擬，我們判斷為中文輸入，則模擬翻譯成日文
             if (isCJK(inputText)) {
                 targetLang = 'ja';
-                // 嘗試從對照表取得翻譯，否則使用預設日文
-                translatedText = TRANSLATION_MAP[inputText] || "すみません、これは何ですか？ (不好意思，請問這是什麼？)"; 
+                // 嘗試從對照表取得翻譯，否則使用 V6.13 通用預設回覆 (謝謝)
+                translatedText = TRANSLATION_MAP[inputText] || "ありがとうございます。 (謝謝。)"; 
             } else {
                 // 模擬其他語言輸入，則翻譯回中文
                 targetLang = 'zh';
